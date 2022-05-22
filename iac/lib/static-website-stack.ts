@@ -1,50 +1,37 @@
-import {App, aws_s3 as S3, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
+import {App, aws_s3 as S3, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
 import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
-import {AllowedMethods, Distribution, OriginAccessIdentity, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
-import {PolicyStatement} from "aws-cdk-lib/aws-iam";
-import {HostedZone, PublicHostedZone} from "aws-cdk-lib/aws-route53";
+import {
+    AllowedMethods,
+    Distribution,
+    SecurityPolicyProtocol,
+    SSLMethod,
+    ViewerProtocolPolicy
+} from "aws-cdk-lib/aws-cloudfront";
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
-import {DnsValidatedCertificate} from "aws-cdk-lib/aws-certificatemanager";
+import {WebSiteCertificates} from "./website-certificates";
+import {ARecord, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
+import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 
 export interface StaticWebsiteStackProps extends StackProps {
-    domainName: string;
-    subdomain: string;
+    apexDomain: string;
+    webSubdomain: string;
+    webCerts: WebSiteCertificates
 }
 
 export class StaticWebsiteStack extends Stack {
     constructor(parent: App, name: string, props: StaticWebsiteStackProps) {
         super(parent, name, props);
 
-        const hostedZone = HostedZone.fromLookup(this, "Zone", {
-            domainName: props.domainName,
-        });
-
-        const wwwDomainName = `www.${props.domainName}`
-        new CfnOutput(this, 'SiteDomainName', {value: 'https://' + props.domainName});
-        new CfnOutput(this, 'WWWSiteDomainName', {value: 'https://' + wwwDomainName});
-        new CfnOutput(this, "HostedZoneArn", {value: hostedZone.hostedZoneArn});
-
-        const cert = new DnsValidatedCertificate(
-            this,
-            "SiteCertificate",
-            {
-                domainName: props.domainName,
-                subjectAlternativeNames: [wwwDomainName],
-                hostedZone: hostedZone,
-                region: "us-east-1", // Cloudfront only checks this region for certificates.
-            }
-        );
-
-        new CfnOutput(this, "Certificate", {value: cert.certificateArn});
-
+        let wwwDomain = `${props.webSubdomain}.${props.apexDomain}`;
+        console.log("wwwDomain is " + wwwDomain)
         // The behaviour of the distribution is dynamic see: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cloudfront-readme.html
         // This bucket is handled as a bucket origin and CloudFront's redirect and error handling will be used.
         // The Origin will create an origin access identity and grant it access to the underlying bucket.
         // This can be used in conjunction with a bucket that is not public to require that your users access your content using CloudFront URLs and not S3 URLs directly.
         let bucketProps: BucketProps = {
-            websiteIndexDocument: 'index.html',
-            bucketName: `site-${props.domainName}`,
+            bucketName: `site-${props.apexDomain}`,
             autoDeleteObjects: true,
             removalPolicy: RemovalPolicy.DESTROY,
             publicReadAccess: false,
@@ -52,16 +39,17 @@ export class StaticWebsiteStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         };
 
-        const siteContentBucket = new S3.Bucket(this, props.domainName, bucketProps)
+        const siteContentBucket = new S3.Bucket(this, props.apexDomain, bucketProps)
 
-        new Distribution(this, 'CloudFrontDistribution', {
-            domainNames: [props.domainName],
+        const distribution = new Distribution(this, 'CloudFrontDistribution', {
+            domainNames: [props.apexDomain, wwwDomain],
             defaultRootObject: 'index.html',
-            certificate: cert,
+            certificate: props.webCerts.siteCertificate,
+            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2016,
             defaultBehavior: {
                 compress: true,
                 origin: new S3Origin(siteContentBucket),
-                allowedMethods: AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+                allowedMethods: AllowedMethods.ALLOW_ALL,
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             },
             errorResponses: [
@@ -72,6 +60,19 @@ export class StaticWebsiteStack extends Stack {
                     ttl: Duration.minutes(30),
                 }
             ],
-        })
+        });
+
+        new ARecord(this, 'SiteAliasRecord', {
+            recordName: wwwDomain,
+            target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
+            zone: props.webCerts.hostedZone
+        });
+
+        new BucketDeployment(this, 'DeployWebsite', {
+            sources: [Source.asset('../site-content')],
+            destinationBucket: siteContentBucket,
+            distributionPaths: ['/*'],
+            distribution,
+        });
     }
 }
