@@ -1,27 +1,31 @@
-import {App, aws_s3 as S3, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
-import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
-import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
 import {
     AllowedMethods,
     Distribution,
     SecurityPolicyProtocol,
-    SSLMethod,
     ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
+
+import {aws_s3 as S3, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
+import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
+import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
-import {WebSiteCertificates} from "./website-certificates";
+import {WebsiteCertificatesStack} from "./website-certificates";
 import {ARecord, RecordTarget} from "aws-cdk-lib/aws-route53";
 import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
+import {Construct} from "constructs";
 
 export interface StaticWebsiteStackProps extends StackProps {
     apexDomain: string;
     webSubdomain: string;
-    webCerts: WebSiteCertificates
+    webCerts: WebsiteCertificatesStack
 }
 
 export class StaticWebsiteStack extends Stack {
-    constructor(parent: App, name: string, props: StaticWebsiteStackProps) {
+
+    public readonly siteContentBucket: S3.Bucket
+
+    constructor(parent: Construct, name: string, props: StaticWebsiteStackProps) {
         super(parent, name, props);
 
         let wwwDomain = `${props.webSubdomain}.${props.apexDomain}`;
@@ -39,7 +43,7 @@ export class StaticWebsiteStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         };
 
-        const siteContentBucket = new S3.Bucket(this, props.apexDomain, bucketProps)
+        this.siteContentBucket = new S3.Bucket(this, props.apexDomain, bucketProps)
 
         const distribution = new Distribution(this, 'CloudFrontDistribution', {
             domainNames: [props.apexDomain, wwwDomain],
@@ -48,7 +52,7 @@ export class StaticWebsiteStack extends Stack {
             minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2016,
             defaultBehavior: {
                 compress: true,
-                origin: new S3Origin(siteContentBucket),
+                origin: new S3Origin(this.siteContentBucket),
                 allowedMethods: AllowedMethods.ALLOW_ALL,
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             },
@@ -69,8 +73,8 @@ export class StaticWebsiteStack extends Stack {
         });
 
         new BucketDeployment(this, 'DeployWebsite', {
-            sources: [Source.asset('../site-content')],
-            destinationBucket: siteContentBucket,
+            sources: [Source.asset('site-content')],
+            destinationBucket: this.siteContentBucket,
             distributionPaths: ['/*'],
             distribution,
         });

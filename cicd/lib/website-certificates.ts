@@ -1,16 +1,17 @@
-import {App, Stack, StackProps} from 'aws-cdk-lib';
+import {Stack, StackProps} from 'aws-cdk-lib';
 import {HostedZone, IHostedZone} from "aws-cdk-lib/aws-route53";
 import {DnsValidatedCertificate, ICertificate} from "aws-cdk-lib/aws-certificatemanager";
+import {Construct} from "constructs";
 
 export interface WebSiteCertificatesProps extends StackProps {
     apexDomain: string;
 }
 
-export class WebSiteCertificates extends Stack {
+export class WebsiteCertificatesStack extends Stack {
     public readonly siteCertificate: ICertificate;
     public readonly hostedZone: IHostedZone;
 
-    constructor(parent: App, name: string, props: WebSiteCertificatesProps) {
+    constructor(parent: Construct, name: string, props: WebSiteCertificatesProps) {
         super(parent, name, props);
 
         const wwwSubdomain = "www"
