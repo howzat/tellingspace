@@ -1,0 +1,6 @@
+@tailwind components;
+@tailwind utilities;
+
+.sprite-link {
+    @apply font-sans text-xl
+}
