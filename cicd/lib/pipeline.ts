@@ -1,133 +1,158 @@
-import {aws_config, SecretValue, Stack, StackProps} from 'aws-cdk-lib';
+import {SecretValue, Stack, StackProps, Stage, StageProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {Artifact, Pipeline} from "aws-cdk-lib/aws-codepipeline";
-import {GitHubSourceAction} from "aws-cdk-lib/aws-codepipeline-actions";
-import {pipeline} from "stream";
-import {sourceArtifactBounds} from "aws-cdk-lib/aws-codepipeline-actions/lib/common";
+import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from "aws-cdk-lib/aws-codepipeline-actions";
+import {BuildSpec, Project} from "aws-cdk-lib/aws-codebuild";
+import {Bucket, IBucket} from "aws-cdk-lib/aws-s3";
+import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines";
 
 export class SourceConfig {
-    constructor(branchName: string, owner: string, repositoryName: string, githubTokenPath: string) {
+    constructor(branchName: string, owner: string, repositoryName: string) {
         this.branchName = branchName
         this.owner = owner
         this.repositoryName = repositoryName;
-        this.githubTokenPath = githubTokenPath
+        this.output = new Artifact('SourceStageOutput')
     }
 
     public readonly branchName: string
     public readonly owner: string
     public readonly repositoryName: string;
     public readonly githubTokenPath: string
+    public readonly output: Artifact;
+
+    public repositoryString(): string {
+        return `${this.owner}/${this.repositoryName}`
+    }
+
+    public gitHubTokenPath(): string {
+        return `/github/${this.repositoryString()}`
+    }
+}
+
+export class BuildConfig {
+    constructor() {
+        this.output = new Artifact('BuildStageOutput')
+    }
+
+    public readonly output: Artifact;
 }
 
 export class PipelineConfig {
-    constructor(appName: string, sourceConfig: SourceConfig) {
+    constructor(appName: string, sourceConfig: SourceConfig, buildConfig: BuildConfig) {
         this.appName = appName;
-        this.sourceConfig = sourceConfig
+        this.sourceStageConfig = sourceConfig
+        this.buildStageConfig = buildConfig;
     }
 
-    public readonly sourceConfig: SourceConfig;
+    public readonly sourceStageConfig: SourceConfig;
+    public readonly buildStageConfig: BuildConfig;
     public readonly appName: string;
 }
 
 export class WebsitePipeline extends Stack {
+    private readonly pipelineConfig: PipelineConfig;
+    private authentication: SecretValue;
+
     constructor(pipelineConfig: PipelineConfig, scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
-        const sourceConfig = pipelineConfig.sourceConfig;
+        this.pipelineConfig = pipelineConfig;
 
         //CodePipeline object
-        const codePipeline = new Pipeline(this, `${pipelineConfig.appName}CodePipeline`, {
-            crossAccountKeys: false
+        let sourceStage = pipelineConfig.sourceStageConfig;
+        let repoString = sourceStage.repositoryString();
+        console.log(repoString)
+        console.log(sourceStage.branchName)
+        console.log(sourceStage.gitHubTokenPath())
+        this.authentication = SecretValue.secretsManager(sourceStage.gitHubTokenPath());
+        console.log(this.authentication)
+        console.log(this.authentication.unsafeUnwrap())
+
+        const codePipeline = new CodePipeline(this, `${pipelineConfig.appName}BuildPipeline`, {
+            pipelineName: 'ToldSpacesCICDPipeline',
+            crossAccountKeys: false,
+            synth: new ShellStep('Synth', {
+                input: CodePipelineSource.gitHub(repoString, sourceStage.branchName, {
+                    trigger: GitHubTrigger.WEBHOOK,
+                    authentication: this.authentication,
+                }),
+                installCommands: ["npm install -g aws-cdk"],
+                commands: [
+                    'ls -la',
+                    'cd webapp',
+                    "npm ci",
+                    "npm run build",
+                    'npx cdk synth',
+                ],
+            }),
         });
 
-        //Source stage
-        const sourceStage = new SourceStage(this, pipelineConfig.appName, pipelineConfig.sourceConfig);
-        codePipeline.addStage({
-            stageName: "SourceGitHub",
-            actions: [sourceStage.getGithubSourceAction()]
-        });
+        // const sourceStage = new SourceStage(this, this.artifactBucket, pipelineConfig);
+        // let pipelineSourceStage = codePipeline.addStage({
+        //     stageName: "SourceGitHub",
+        //     actions: [sourceStage.getGithubSourceAction()],
+        // });
+
+        // codePipeline.addStage(new DoNothingStage(this, 'DoNothingStage' {
+        //     actionName( "")
+        // }));
     }
 }
 
-export const PipelineWithSourceConfig =  (source:SourceConfig) => (scope: Construct, id: string, props: StackProps) => {
-    return (scope: Construct, id: string, props: StackProps) => {
-        return new WebsitePipeline(new PipelineConfig("", source), scope, id, props)
-    };
-};
-
 export class SourceStage {
-
-    private stack: Stack;
-    private readonly appName: string;
-    private readonly config: SourceConfig;
-    private readonly sourceOutput: Artifact;
-
-    constructor(stack: Stack, appName: string, config: SourceConfig) {
+    constructor(stack: Stack, artifactBucket: IBucket, config: PipelineConfig) {
+        this.artifactBucket = artifactBucket;
         this.stack = stack;
-        this.appName = appName;
+        this.appName = config.appName;
         this.config = config;
-        this.sourceOutput = new Artifact('SourceArtifact');
     }
 
     public getGithubSourceAction = (): GitHubSourceAction => {
-        const {owner, repositoryName, branchName} = this.config;
+        const {owner, repositoryName, branchName, githubTokenPath} = this.config.sourceStageConfig;
 
         return new GitHubSourceAction({
             actionName: 'GitHubSource',
-            owner: this.config.owner,
-            repo: this.config.repositoryName,
-            oauthToken: SecretValue.secretsManager(this.config.githubTokenPath),
-            output: this.sourceOutput,
-            branch: this.config.branchName,
+            owner: owner,
+            repo: repositoryName,
+            oauthToken: SecretValue.secretsManager(githubTokenPath),
+            output: this.config.sourceStageConfig.output,
+            branch: branchName,
+            trigger: GitHubTrigger.WEBHOOK,
         })
     }
 
-    public getSourceOutput = (): Artifact => {
-        return this.sourceOutput;
-    }
+    private artifactBucket: IBucket;
+    private stack: Stack;
+    private readonly appName: string;
+    private readonly config: PipelineConfig;
 }
 
 
-/*
+export class BuildStage {
+    constructor(stack: Stack, artifactBucket: Bucket, codePipeline: Pipeline, config: PipelineConfig) {
+        this.config = config;
+        this.stack = stack;
+    }
 
-const pipeline = new codepipeline.Pipeline(this, 'MyPipeline');
-const sourceOutput = new codepipeline.Artifact();
-const sourceAction = new codepipeline_actions.GitHubSourceAction({
-  actionName: 'GitHub_Source',
-  owner: 'awslabs',
-  repo: 'aws-cdk',
-  oauthToken: SecretValue.secretsManager('my-github-token'),
-  output: sourceOutput,
-  branch: 'develop', // default: 'master'
-});
-pipeline.addStage({
-  stageName: 'Source',
-  actions: [sourceAction],
-});
+    public getBuildStageAction = (): CodeBuildAction => {
+        return new CodeBuildAction({
+            actionName: "Build Static Website",
+            project: new Project(this.stack, "BuildWebsite", {
+                buildSpec: BuildSpec.fromSourceFilename("buildspec.yml"),
+            }),
+            input: this.config.sourceStageConfig.output,
+            outputs: [this.config.buildStageConfig.output],
+        })
+    }
+    private config: PipelineConfig;
+    private readonly stack: Stack;
+}
 
 
-export class PipelineStack extends cdk.Stack {
-
-    public readonly pipeline: CodePipeline
-
-    constructor(source: CodePipelineSource, scope: Construct, id: string, props?: cdk.StackProps) {
+class DoNothingStage extends Stage {
+    constructor(scope: Construct, id: string, props?: StageProps) {
         super(scope, id, props);
 
-        this.pipeline = new CodePipeline(this, 'ToldSpacesBuildPipeline', {
-            pipelineName: 'toldspaces',
-            synth: new ShellStep('Synth', {
-                input: source,
-                commands: [
-                    'npm ci',
-                    'npm run build',
-                    'npx cdk synth'
-                ]
-            })
-        });
-
-        new DeployWebApplicationStage(this, "DeployWebApplicationStage", {
-            env: props?.env
-        })
+        console.log("Nothing to deploy");
     }
 }
- */

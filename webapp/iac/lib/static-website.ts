@@ -73,7 +73,7 @@ export class StaticWebsiteStack extends Stack {
         });
 
         new BucketDeployment(this, 'DeployWebsite', {
-            sources: [Source.asset('site-content')],
+            sources: [Source.asset('../toldspaces')],
             destinationBucket: this.siteContentBucket,
             distributionPaths: ['/*'],
             distribution,
