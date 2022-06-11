@@ -1,38 +1,54 @@
-## How was this site generated?
+<p align="center">
+  <a href="https://www.gatsbyjs.com/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts">
+    <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
+  </a>
+</p>
+<h1 align="center">
+  Gatsby minimal TypeScript starter
+</h1>
 
-[From the tailwind website](https://tailwindcss.com/docs/guides/nextjs)
+## 🚀 Quick start
 
-## Getting Started
+1.  **Create a Gatsby site.**
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+    Use the Gatsby CLI to create a new site, specifying the minimal TypeScript starter.
 
-First, run the development server:
+    ```shell
+    # create a new Gatsby site using the minimal TypeScript starter
+    npm init gatsby
+    ```
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+2.  **Start developing.**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    Navigate into your new site’s directory and start it up.
 
-You can start editing the page by modifying `pages/index.tjx`. The page auto-updates as you edit the file.
+    ```shell
+    cd my-gatsby-site/
+    npm run develop
+    ```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+3.  **Open the code and start customizing!**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+    Your site is now running at http://localhost:8000!
 
-## Learn More
+    Edit `src/pages/index.tsx` to see your site update in real-time!
 
-To learn more about Next.js, take a look at the following resources:
+4.  **Learn more**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    - [Documentation](https://www.gatsbyjs.com/docs/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+    - [Tutorials](https://www.gatsbyjs.com/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
 
-## Deploy on Vercel
+    - [Guides](https://www.gatsbyjs.com/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    - [API Reference](https://www.gatsbyjs.com/docs/api-reference/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+    - [Plugin Library](https://www.gatsbyjs.com/plugins?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
+
+    - [Cheat Sheet](https://www.gatsbyjs.com/docs/cheat-sheet/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
+
+## 🚀 Quick start (Gatsby Cloud)
+
+Deploy this starter with one click on [Gatsby Cloud](https://www.gatsbyjs.com/cloud/):
+
+[<img src="https://www.gatsbyjs.com/deploynow.svg" alt="Deploy to Gatsby Cloud">](https://www.gatsbyjs.com/dashboard/deploynow?url=https://github.com/gatsbyjs/gatsby-starter-minimal-ts)

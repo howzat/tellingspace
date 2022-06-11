@@ -1,0 +1,35 @@
+[
+  {
+    "sid": "thethunderor",
+    "name": "The Thunderor!",
+    "text": "The Journey Begins and the Thunderor Awakes",
+    "image": "../images/first-min.jpg",
+    "coords": {
+      "lat": 50.86441161013995,
+      "lng": -0.09220047454726349
+    },
+    "description": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  {
+    "sid": "splinket",
+    "name": "location2",
+    "text": "Location 2",
+    "image": "../images/second-min.jpg",
+    "coords": {
+      "lat": 50.864059486259166,
+      "lng": -0.09993596512412799
+    },
+    "description": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+  },
+  {
+    "sid": "drblackpill",
+    "name": "location3",
+    "text": "Location 3",
+    "image": "../images/third-min.jpg",
+    "coords": {
+      "lat": 50.868221525389885,
+      "lng": -0.10303260606760026
+    },
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+  }
+]
