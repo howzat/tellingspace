@@ -3,12 +3,10 @@ import {SiteNavigation, SiteNavigationProps, LinkData} from "../components/Navig
 
 export type MainLayoutProps = {
   navigationItems: SiteNavigationProps
-  name: string
   children?: React.ReactNode
 }
 
-export const MainLayout = ({name, navigationItems}: MainLayoutProps): JSX.Element => {
-  console.log("MainLayout name", name)
+export const MainLayout = ({navigationItems}: MainLayoutProps): JSX.Element => {
   console.log("MainLayout navigationItems", navigationItems)
   return (
     <>

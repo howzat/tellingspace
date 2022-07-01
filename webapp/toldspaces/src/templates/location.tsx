@@ -2,7 +2,21 @@ import React from "react"
 import {MainLayout} from "../layouts/MainLayout";
 import {SiteNavigationProps} from "../components/Navigation";
 
-const LocationTemplate = (data: any) => {
+export type LocationTemplateProps = {
+  data: LocationProps
+  pageContext?: any
+}
+
+export type LocationProps = {
+  sids: Array<string>
+  sid: string
+}
+
+const LocationTemplate = ({data, pageContext}: LocationTemplateProps) => {
+
+  console.log("pageContext", pageContext)
+  console.log("data.sid", pageContext.pc.sid)
+  console.log("data.sids", pageContext.pc.sids)
 
   let items: SiteNavigationProps = {
     links: [{
@@ -14,11 +28,10 @@ const LocationTemplate = (data: any) => {
     }]
   }
 
-
   console.log("LocationTemplate items", items)
   return (
     <>
-      <MainLayout name={"ben"} navigationItems={items}><h1>Location Page </h1></MainLayout>
+      <MainLayout navigationItems={items}><h1>Location Page </h1></MainLayout>
     </>
   )
 }

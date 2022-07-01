@@ -1,6 +1,7 @@
 import {CreatePagesArgs} from "gatsby";
 import fs from "fs";
 import path from "path";
+import {LocationProps, LocationTemplateProps} from "./src/templates/location";
 
 export const createPages = async (
     gatsbyContext: CreatePagesArgs,
@@ -34,9 +35,18 @@ export const createPages = async (
         console.error("DOES NOT exist:", s);
     }
 
+    // @ts-ignore
+    let nodes = result.data.allLocationsJson.nodes;
+
+    const pc : LocationTemplateProps = {
+        data: {
+            sids: ["1", "1", "1", "1", "1", "1",],
+            sid: "the sid",
+        }
+    }
 
     // @ts-ignore
-    result.data.allLocationsJson.nodes.forEach(node => {
+    nodes.forEach(node => {
         const path = `/locations/${node.sid}/`
         const component = `${s}`
         console.log("path", path)
@@ -45,6 +55,7 @@ export const createPages = async (
             path,
             component,
             context: {
+                pc,
                 pagePath: path,
             },
         };
