@@ -55,6 +55,7 @@ export const createPages = async (
             path,
             component,
             context: {
+                sid: node.sid,
                 pc,
                 pagePath: path,
             },
