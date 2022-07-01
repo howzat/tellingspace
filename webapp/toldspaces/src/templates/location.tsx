@@ -2,6 +2,7 @@ import React from "react"
 import {MainLayout} from "../layouts/MainLayout";
 import {SiteNavigationProps} from "../components/Navigation";
 import {graphql} from "gatsby";
+import flatprint from "../flatprint";
 
 export type LocationTemplateProps = {
   data: LocationProps
@@ -15,18 +16,16 @@ export type LocationProps = {
 
 const LocationTemplate = ({data, pageContext}: LocationTemplateProps) => {
 
-  console.log("data", data)
-  console.log("pageContext", pageContext)
-  console.log("data.sid", pageContext.pc.sid)
-  console.log("data.sids", pageContext.pc.sids)
+  flatprint("data", data)
+  flatprint("pageContext", pageContext)
 
   let items: SiteNavigationProps = {
     links: [{
       text: "element 1",
-      to: "string",
+      to: "string 1",
     }, {
       text: "element 2",
-      to: "string",
+      to: "string 2",
     }]
   }
 
