@@ -2,6 +2,7 @@ import {CreatePagesArgs} from "gatsby";
 import fs from "fs";
 import path from "path";
 import {LocationProps, LocationTemplateProps} from "./src/templates/location";
+import flatprint from "./src/flatprint";
 
 export const createPages = async (
     gatsbyContext: CreatePagesArgs,
@@ -35,13 +36,15 @@ export const createPages = async (
         console.error("DOES NOT exist:", s);
     }
 
+    flatprint("graphql result returned ok", result)
+
     // @ts-ignore
     let nodes = result.data.allLocationsJson.nodes;
 
-    const pc : LocationTemplateProps = {
+    let sids = nodes.map((p) => p.sid);
+    const pcs = {
         data: {
-            sids: ["1", "1", "1", "1", "1", "1",],
-            sid: "the sid",
+            sids: sids,
         }
     }
 
@@ -55,8 +58,8 @@ export const createPages = async (
             path,
             component,
             context: {
-                sid: node.sid,
-                pc,
+                sids: sids,
+                pc: pcs & { sid1: node.sid },
                 pagePath: path,
             },
         };
@@ -92,3 +95,5 @@ export const createSchemaCustomization = async (
   `
     createTypes(typeDefs)
 }
+
+
