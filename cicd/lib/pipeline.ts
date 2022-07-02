@@ -5,6 +5,9 @@ import {CodeBuildAction, GitHubSourceAction, GitHubTrigger} from "aws-cdk-lib/aw
 import {BuildSpec, Project} from "aws-cdk-lib/aws-codebuild";
 import {Bucket, IBucket} from "aws-cdk-lib/aws-s3";
 import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines";
+import yaml from "js-yaml";
+import fs from "fs";
+import * as path from "path";
 
 export class SourceConfig {
     constructor(branchName: string, owner: string, repositoryName: string) {
@@ -51,7 +54,7 @@ export class PipelineConfig {
 
 export class WebsitePipeline extends Stack {
     private readonly pipelineConfig: PipelineConfig;
-    private authentication: SecretValue;
+    private readonly authentication: SecretValue;
 
     constructor(pipelineConfig: PipelineConfig, scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
@@ -59,12 +62,13 @@ export class WebsitePipeline extends Stack {
         this.pipelineConfig = pipelineConfig;
 
         //CodePipeline object
-        let sourceStage = pipelineConfig.sourceStageConfig;
-        let repoString = sourceStage.repositoryString();
+        let sourceStageConfig = pipelineConfig.sourceStageConfig;
+        let repoString = sourceStageConfig.repositoryString();
         console.log(repoString)
-        console.log(sourceStage.branchName)
-        console.log(sourceStage.gitHubTokenPath())
-        this.authentication = SecretValue.secretsManager(sourceStage.gitHubTokenPath());
+        console.log(sourceStageConfig.branchName)
+        console.log(sourceStageConfig.gitHubTokenPath())
+
+        this.authentication = SecretValue.secretsManager(sourceStageConfig.gitHubTokenPath());
         console.log(this.authentication)
         console.log(this.authentication.unsafeUnwrap())
 
@@ -72,7 +76,7 @@ export class WebsitePipeline extends Stack {
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
             synth: new ShellStep('Synth', {
-                input: CodePipelineSource.gitHub(repoString, sourceStage.branchName, {
+                input: CodePipelineSource.gitHub(repoString, sourceStageConfig.branchName, {
                     trigger: GitHubTrigger.WEBHOOK,
                     authentication: this.authentication,
                 }),
@@ -80,22 +84,17 @@ export class WebsitePipeline extends Stack {
                 commands: [
                     'ls -la',
                     'cd webapp',
-                    "npm ci",
-                    "npm run build",
-                    'npx cdk synth',
+                    'ls -la',
                 ],
             }),
         });
 
-        // const sourceStage = new SourceStage(this, this.artifactBucket, pipelineConfig);
-        // let pipelineSourceStage = codePipeline.addStage({
-        //     stageName: "SourceGitHub",
-        //     actions: [sourceStage.getGithubSourceAction()],
-        // });
-
-        // codePipeline.addStage(new DoNothingStage(this, 'DoNothingStage' {
-        //     actionName( "")
-        // }));
+        let buildStage = new BuildStage(this, this.pipelineConfig);
+        let buildStageAction: CodeBuildAction = buildStage.getBuildStageAction();
+        codePipeline.addStage({
+            stageName: "BuildStaticWebsite",
+            actions:
+        });
     }
 }
 
@@ -128,22 +127,34 @@ export class SourceStage {
 }
 
 
-export class BuildStage {
-    constructor(stack: Stack, artifactBucket: Bucket, codePipeline: Pipeline, config: PipelineConfig) {
+export class BuildToldSpacesWebsite extends Stage {
+
+    constructor(scope: Construct, id: string, config: PipelineConfig, props?: StageProps) {
+        super(scope, id, props);
         this.config = config;
-        this.stack = stack;
     }
 
     public getBuildStageAction = (): CodeBuildAction => {
+        let buildspecYaml = path.resolve(__dirname, '../webapp/buildspec.yml');
+        console.log(`computed buildspec location ${buildspecYaml}`)
+        let exists = fs.existsSync(buildspecYaml);
+        console.log(`buildspecYaml exists at path ${path}=${exists}`)
+
+        let fileContents = fs.readFileSync(buildspecYaml, 'utf8');
+        let buildspec = yaml.load(fileContents) as { [key: string]: any };
+
+        console.log(`read buildspec successfully ${buildspec}`);
+
         return new CodeBuildAction({
             actionName: "Build Static Website",
             project: new Project(this.stack, "BuildWebsite", {
-                buildSpec: BuildSpec.fromSourceFilename("buildspec.yml"),
+                buildSpec: BuildSpec.fromObject(buildspec),
             }),
             input: this.config.sourceStageConfig.output,
             outputs: [this.config.buildStageConfig.output],
         })
     }
+
     private config: PipelineConfig;
     private readonly stack: Stack;
 }

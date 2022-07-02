@@ -5,13 +5,14 @@ import {
     ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
 
-import {aws_s3 as S3, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
+import {aws_s3 as S3, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
 import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
 import {WebsiteCertificatesStack} from "./website-certificates";
 import {ARecord, RecordTarget} from "aws-cdk-lib/aws-route53";
 import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
+import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import {Construct} from "constructs";
 
 export interface StaticWebsiteStackProps extends StackProps {
@@ -71,10 +72,11 @@ export class StaticWebsiteStack extends Stack {
             zone: props.webCerts.hostedZone
         });
 
-        new CfnOutput(this, "WebsiteContentBucketDomainName", {value: this.siteContentBucket.bucketName,});
-        new CfnOutput(this, "WebsiteContentBucketName", {value: this.siteContentBucket.bucketDomainName,});
-        new CfnOutput(this, 'WebsiteContentBucket', {value: this.siteContentBucket.bucketArn});
-        new CfnOutput(this, 'DistributionDomainName', {value: distribution.domainName});
-        new CfnOutput(this, 'DistributionDomainName', {value: distribution.distributionId});
+        // new BucketDeployment(this, 'DeployWebsite', {
+        //     sources: [Source.asset('../toldspaces')],
+        //     destinationBucket: this.siteContentBucket,
+        //     distributionPaths: ['/*'],
+        //     distribution,
+        // });
     }
 }

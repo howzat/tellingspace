@@ -4,15 +4,23 @@ The project directory contains both the code that creates the code building pipe
 going to build and deploy. The CICD `bootstrap.ts` CDK project creates the CodeBuild Pipeline that builds and 
 deploys a Gatsby static site to an S3 bucket with a Cloudfront distribution.
 
-# Building the Pipeline
+To provision the pipeline make sure the target environment has been bootstrapped and then execute deploying the WebsitePipelineStack once. Afterwards, the pipeline will keep itself up-to-date. [See the Pipelines CDK construct for more information](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.pipelines-readme.html)
+
+>Important: be sure to git commit and git push before deploying the Pipeline stack using cdk deploy!
+>The reason is that the pipeline will start deploying and self-mutating right away based on the sources in the repository, so the sources it finds in there should be the ones you want it to find.
+
+# Secrets used in building the Pipeline
 The pipeline relies on a Github token stored (by hand) in AWS `SecretsManager` to register hooks for triggering the build.
 Running the script should produce somthing like the following output.
 
 This should only need to be done when a change to the pipeline is required.
 
 ```shell
-cd cicd
-aws-vault exec tsdev -- cdk deploy -c sourceOwner=howzat -c sourceRepository=toldspaces
+$ cd cicd
+$ git commit -a
+$ git push
+$ cdk deploy WebsitePipelineStack
+$ aws-vault exec tsdev -- cdk deploy -c sourceOwner=howzat -c sourceRepository=toldspaces
 Enter token for arn:aws:iam::678975692412:mfa/tsdev: 926768
 SecretValue {
   creationStack: [ 'stack traces disabled' ],
@@ -41,7 +49,7 @@ WebsitePipelineStack: creating CloudFormation changeset...
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
-## Useful commands
+## Useful CDK commands
 
 * `npm run build`   compile typescript to js
 * `npm run watch`   watch for changes and compile
