@@ -4,6 +4,7 @@ import {Artifact} from "aws-cdk-lib/aws-codepipeline";
 import {GitHubTrigger} from "aws-cdk-lib/aws-codepipeline-actions";
 import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines";
 import {StaticWebsiteHostingDeployStage} from "./deploy-stage";
+import {BuildSpec} from "aws-cdk-lib/aws-codebuild";
 
 export class SourceConfig {
     constructor(branchName: string, owner: string, repositoryName: string) {
@@ -69,6 +70,22 @@ export class WebsitePipeline extends Stack {
         const codePipeline = new CodePipeline(this, `${pipelineConfig.appName}BuildPipeline`, {
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
+            codeBuildDefaults: {
+                partialBuildSpec: BuildSpec.fromObject({
+                    version: "0.2",
+                    env: {
+                        "exported-variables": ["IS_CODEBUILD"]
+                    },
+                    phases: {
+                        install: {
+                            "runtime-versions": {
+                                nodejs: 14
+                            },
+                            commands: ['export IS_CODEBUILD="true"', "n 16.14.0"]
+                        }
+                    }
+                })
+            },
             synth: new ShellStep('Synth', {
                 input: CodePipelineSource.gitHub(repoString, sourceStageConfig.branchName, {
                     trigger: GitHubTrigger.WEBHOOK,
