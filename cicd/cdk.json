@@ -17,6 +17,10 @@
     ]
   },
   "context": {
+    "wwwSubdomain": "www",
+    "apexDomain": "toldspaces.com",
+    "sourceOwner": "howzat",
+    "sourceRepository": "toldspaces",
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
     "@aws-cdk/core:newStyleStackSynthesis": true,
     "@aws-cdk/core:stackRelativeExports": true,

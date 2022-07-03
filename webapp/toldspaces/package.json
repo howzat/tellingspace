@@ -8,11 +8,11 @@
     "gatsby"
   ],
   "scripts": {
-    "develop": "gatsby develop",
+    "develop": "gatsby develop --verbose",
     "start": "gatsby develop",
-    "build": "gatsby build",
+    "build": "gatsby build --verbose",
     "serve": "gatsby serve",
-    "clean": "gatsby clean",
+    "clean": "gatsby clean --verbose",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
