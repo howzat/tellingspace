@@ -55,7 +55,6 @@ export class WebsitePipeline extends Stack {
         console.log("authentication", this.authentication)
 
         const codePipeline = new CodePipeline(this, `${config.appName}BuildPipeline`, {
-            selfMutation: false,
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
             codeBuildDefaults: {
