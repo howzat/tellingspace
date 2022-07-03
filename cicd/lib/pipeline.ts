@@ -1,4 +1,4 @@
-import {CfnOutput, SecretValue, Stack, StackProps, Stage} from 'aws-cdk-lib';
+import {SecretValue, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {Artifact} from "aws-cdk-lib/aws-codepipeline";
 import {GitHubTrigger} from "aws-cdk-lib/aws-codepipeline-actions";
@@ -78,6 +78,7 @@ export class WebsitePipeline extends Stack {
                     "echo installCommands",
                     "ls -la",
                     "cd webapp/toldspaces",
+                    "ls -la",
                     "npm ci",
                     "cd ../../cicd",
                     "npm install",
