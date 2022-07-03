@@ -1,11 +1,6 @@
-import {
-    AllowedMethods,
-    Distribution,
-    SecurityPolicyProtocol,
-    ViewerProtocolPolicy
-} from "aws-cdk-lib/aws-cloudfront";
+import {AllowedMethods, Distribution, SecurityPolicyProtocol, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
 
-import {aws_s3, aws_s3 as S3, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
+import {aws_s3 as S3, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
 import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
 import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
@@ -45,13 +40,14 @@ export class StaticWebsiteStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         };
 
-        this.siteContentBucket = new S3.Bucket(this, props.apexDomain, bucketProps)
+        this.siteContentBucket = new S3.Bucket(this, 'WebsiteBuket', bucketProps)
+        console.log("content bucket created", this.siteContentBucket.bucketArn)
 
         const distribution = new Distribution(this, 'CloudFrontDistribution', {
             domainNames: [props.apexDomain, wwwDomain],
             defaultRootObject: 'index.html',
             certificate: props.webCerts.siteCertificate,
-            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2016,
+            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
             defaultBehavior: {
                 compress: true,
                 origin: new S3Origin(this.siteContentBucket),

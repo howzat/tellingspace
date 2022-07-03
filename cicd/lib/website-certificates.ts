@@ -19,7 +19,7 @@ export class WebsiteCertificatesStack extends Stack {
         console.log(`creating certificates from HostedZone: ${props.apexDomain}`);
         console.log(`auto generated www subdomain: ${siteDomain}`);
 
-        const zone = HostedZone.fromLookup(this, "Zone", {
+        const zone = HostedZone.fromLookup(this, "HostedZone", {
             domainName: props.apexDomain,
         });
 
@@ -27,14 +27,46 @@ export class WebsiteCertificatesStack extends Stack {
         console.log(`hosted zone found: ${zone}`);
 
         this.siteCertificate = new DnsValidatedCertificate(
-            this,
-            "SiteCertificate",
-            {
-                domainName: props.apexDomain,
-                subjectAlternativeNames: [siteDomain],
-                hostedZone: zone,
-                region: "us-east-1", // Cloudfront only checks this region for certificates.
-            }
+          this,
+          "SiteCertificate",
+          {
+              domainName: props.apexDomain,
+              subjectAlternativeNames: [siteDomain],
+              hostedZone: zone,
+              region: "us-east-1", // Cloudfront only checks this region for certificates.
+          }
         );
+
+
+//         const cfFunction = new Function(this, 'CloudFrontFunction', {
+//             code: FunctionCode.fromInline(`
+// function handler(event) {
+// var request = event.request;
+// var uri = request.uri;
+//
+// // Check whether the URI is missing a file name.
+// if (uri.endsWith('/')) {
+// request.uri += 'index.html';
+// }
+// // Check whether the URI is missing a file extension.
+// else if (!uri.includes('.')) {
+// request.uri += '/index.html';
+// }
+//
+// return request;
+// }
+//             `),
+//         });
+
+        // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cloudfront.ResponseSecurityHeadersBehavior.html
+        //     new ResponseHeadersPolicy(this, "ResponseHeadersPolicy", {
+        //         comment:"Security Headers",
+        //         responseHeadersPolicyName:`${props.apexDomain}-SecurityHeadersPolicy`,
+        //         securityHeadersBehavior: {
+        //             contentSecurityPolicy: {
+        //                 contentSecurityPolicy: '', override: true
+        //             }
+        //         }
+        //     })
     }
 }
