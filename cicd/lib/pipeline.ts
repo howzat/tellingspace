@@ -81,7 +81,11 @@ export class WebsitePipeline extends Stack {
                             "runtime-versions": {
                                 nodejs: 14
                             },
-                            commands: ['export IS_CODEBUILD="true"', "n 16.15.0"]
+                            commands: [
+                                'export IS_CODEBUILD="true"',
+                                "npm install -g npm@8",
+                                "n 16.15.1",
+                            ]
                         }
                     }
                 })
