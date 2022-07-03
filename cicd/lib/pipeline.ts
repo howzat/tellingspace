@@ -92,10 +92,7 @@ export class WebsitePipeline extends Stack {
                     authentication: this.authentication,
                 }),
                 installCommands: [
-                    "echo installCommands",
-                    "ls -la",
                     "cd webapp/toldspaces",
-                    "ls -la",
                     "npm install",
                     "npm ci",
                     "cd ../../cicd",
@@ -104,8 +101,8 @@ export class WebsitePipeline extends Stack {
                 ],
                 commands: [
                     "echo commands",
-                    "ls -la",
                     "cd ../webapp/toldspaces",
+                    "ls -la",
                     "npm run clean & npm run build",
                     "cdk synth",
                 ],
