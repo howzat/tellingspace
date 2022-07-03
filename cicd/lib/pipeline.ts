@@ -79,6 +79,7 @@ export class WebsitePipeline extends Stack {
                     "ls -la",
                     "cd webapp/toldspaces",
                     "ls -la",
+                    "npm install",
                     "npm ci",
                     "cd ../../cicd",
                     "npm install",

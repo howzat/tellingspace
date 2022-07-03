@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import {Stage, StageProps} from 'aws-cdk-lib';
 import {BuildConfig, PipelineConfig, SourceConfig, WebsitePipeline} from "../lib/pipeline";
-import {WebsiteCertificatesStack} from "../lib/website-certificates";
-import {StaticWebsiteStack} from "../lib/static-website";
-import {Construct} from "constructs";
-import {StaticWebsiteHostingDeployStage} from "../lib/deploy-stage";
 
 const app = new cdk.App();
 const appName = "ToldSpaces"
