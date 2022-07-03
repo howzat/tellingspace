@@ -68,6 +68,7 @@ export class WebsitePipeline extends Stack {
         console.log("authentication", this.authentication)
 
         const codePipeline = new CodePipeline(this, `${pipelineConfig.appName}BuildPipeline`, {
+            selfMutation: false,
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
             codeBuildDefaults: {
@@ -93,6 +94,7 @@ export class WebsitePipeline extends Stack {
                 })
             },
             synth: new ShellStep('Synth', {
+                primaryOutputDirectory: 'cicd/cdk.out',
                 input: CodePipelineSource.gitHub(repoString, sourceStageConfig.branchName, {
                     trigger: GitHubTrigger.WEBHOOK,
                     authentication: this.authentication,
@@ -110,6 +112,7 @@ export class WebsitePipeline extends Stack {
                     "cd ../webapp/toldspaces",
                     "ls -la",
                     "npm run clean & npm run build",
+                    "cd ../../cicd",
                     "cdk synth",
                 ],
             }),
