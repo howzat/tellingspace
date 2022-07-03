@@ -5,7 +5,7 @@ import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines
 import {StaticWebsiteHostingDeployStage} from "./deploy-stage";
 import {BuildSpec} from "aws-cdk-lib/aws-codebuild";
 
-export class SourceConfig {
+export class GithubSourceConfig {
     constructor(branchName: string, owner: string, repositoryName: string) {
         this.branchName = branchName
         this.owner = owner
@@ -26,35 +26,35 @@ export class SourceConfig {
 }
 
 export class PipelineConfig {
-    constructor(appName: string, sourceConfig: SourceConfig) {
+    constructor(appName: string, githubSourceConfig: GithubSourceConfig) {
         this.appName = appName;
-        this.sourceStageConfig = sourceConfig
+        this.githubSourceConfig = githubSourceConfig
     }
 
-    public readonly sourceStageConfig: SourceConfig;
+    public readonly githubSourceConfig: GithubSourceConfig;
     public readonly appName: string;
 }
 
 export class WebsitePipeline extends Stack {
-    private readonly pipelineConfig: PipelineConfig;
+    private readonly config: PipelineConfig;
     private readonly authentication: SecretValue;
 
-    constructor(scope: Construct, id: string, pipelineConfig: PipelineConfig, props?: StackProps) {
+    constructor(scope: Construct, id: string, config: PipelineConfig, props?: StackProps) {
         super(scope, id, props);
 
-        this.pipelineConfig = pipelineConfig;
+        this.config = config;
 
         //CodePipeline object
-        let sourceStageConfig = pipelineConfig.sourceStageConfig;
-        let repoString = sourceStageConfig.repositoryString();
+        let githubConfig = config.githubSourceConfig;
+        let repoString = githubConfig.repositoryString();
         console.log("repoString", repoString)
-        console.log("branchName", sourceStageConfig.branchName)
-        console.log("githubTokenPath", sourceStageConfig.gitHubTokenPath())
+        console.log("branchName", githubConfig.branchName)
+        console.log("githubTokenPath", githubConfig.gitHubTokenPath())
 
-        this.authentication = SecretValue.secretsManager(sourceStageConfig.gitHubTokenPath());
+        this.authentication = SecretValue.secretsManager(githubConfig.gitHubTokenPath());
         console.log("authentication", this.authentication)
 
-        const codePipeline = new CodePipeline(this, `${pipelineConfig.appName}BuildPipeline`, {
+        const codePipeline = new CodePipeline(this, `${config.appName}BuildPipeline`, {
             selfMutation: false,
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
@@ -82,7 +82,7 @@ export class WebsitePipeline extends Stack {
             },
             synth: new ShellStep('Synth', {
                 primaryOutputDirectory: 'cicd/cdk.out',
-                input: CodePipelineSource.gitHub(repoString, sourceStageConfig.branchName, {
+                input: CodePipelineSource.gitHub(repoString, githubConfig.branchName, {
                     trigger: GitHubTrigger.WEBHOOK,
                     authentication: this.authentication,
                 }),

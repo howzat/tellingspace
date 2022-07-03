@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import {BuildConfig, PipelineConfig, SourceConfig, WebsitePipeline} from "../lib/pipeline";
+import {BuildConfig, GithubSourceConfig, PipelineConfig, WebsitePipeline} from "../lib/pipeline";
 
 const app = new cdk.App();
 const appName = "ToldSpaces"
 const sourceOwner = app.node.tryGetContext('sourceOwner');
 const sourceRepositoryName = app.node.tryGetContext('sourceRepository');
-const sourceConfig = new SourceConfig("main", sourceOwner, sourceRepositoryName);
+const sourceConfig = new GithubSourceConfig("main", sourceOwner, sourceRepositoryName);
 const pipelineConfig = new PipelineConfig(appName, sourceConfig, new BuildConfig());
 
 let env = {
