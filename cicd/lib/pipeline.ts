@@ -85,6 +85,8 @@ export class WebsitePipeline extends Stack {
                                 'export IS_CODEBUILD="true"',
                                 "npm install -g npm@8",
                                 "n 16.15.1",
+                                "node -v",
+                                "npm -v",
                             ]
                         }
                     }
