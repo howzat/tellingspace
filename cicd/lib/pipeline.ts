@@ -1,6 +1,5 @@
 import {SecretValue, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
-import {Artifact} from "aws-cdk-lib/aws-codepipeline";
 import {GitHubTrigger} from "aws-cdk-lib/aws-codepipeline-actions";
 import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines";
 import {StaticWebsiteHostingDeployStage} from "./deploy-stage";
@@ -11,13 +10,11 @@ export class SourceConfig {
         this.branchName = branchName
         this.owner = owner
         this.repositoryName = repositoryName;
-        this.output = new Artifact('SourceStageOutput')
     }
 
     public readonly branchName: string
     public readonly owner: string
     public readonly repositoryName: string;
-    public readonly output: Artifact;
 
     public repositoryString(): string {
         return `${this.owner}/${this.repositoryName}`
@@ -28,23 +25,13 @@ export class SourceConfig {
     }
 }
 
-export class BuildConfig {
-    constructor() {
-        this.output = new Artifact('BuildStageOutput')
-    }
-
-    public readonly output: Artifact;
-}
-
 export class PipelineConfig {
-    constructor(appName: string, sourceConfig: SourceConfig, buildConfig: BuildConfig) {
+    constructor(appName: string, sourceConfig: SourceConfig) {
         this.appName = appName;
         this.sourceStageConfig = sourceConfig
-        this.buildStageConfig = buildConfig;
     }
 
     public readonly sourceStageConfig: SourceConfig;
-    public readonly buildStageConfig: BuildConfig;
     public readonly appName: string;
 }
 
