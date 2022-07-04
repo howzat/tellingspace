@@ -58,7 +58,7 @@ export class StaticWebsiteStack extends Stack {
                 {
                     httpStatus: 403,
                     responseHttpStatus: 403,
-                    responsePagePath: '/error.html',
+                    responsePagePath: '404.html',
                     ttl: Duration.minutes(30),
                 }
             ],
@@ -71,15 +71,15 @@ export class StaticWebsiteStack extends Stack {
         });
 
         let contentsLocation = path.join("..", "webapp", "toldspaces", "public");
-        let resolve = path.resolve(contentsLocation);
         console.log("contentsLocation from path", contentsLocation)
         // @ts-ignore
         fs.readdirSync(contentsLocation).forEach(file => {
             console.log(file);
         });
 
+        let resolve = path.resolve(contentsLocation);
         console.log("contentsLocation resolved", resolve)
-        fs.readdirSync(contentsLocation).forEach(file => {
+        fs.readdirSync(resolve).forEach(file => {
             console.log(file);
         });
 
