@@ -70,14 +70,9 @@ export class StaticWebsiteStack extends Stack {
             zone: props.webCerts.hostedZone
         });
 
-        let pwd = path.join("./");
-        console.log("contentsLocation from pwd", getAllFilesFromFolder(pwd))
-
         let contentsLocation = path.join("./", "..", "webapp", "toldspaces", "public");
-        console.log("contentsLocation from path", getAllFilesFromFolder(contentsLocation))
-
         let resolve = path.resolve(contentsLocation);
-        console.log("contentsLocation from path", getAllFilesFromFolder(contentsLocation))
+        console.log("resolved location of assets contains", getAllFilesFromFolder(resolve))
 
         new BucketDeployment(this, 'DeployWebsite', {
             sources: [Source.asset(contentsLocation)],
