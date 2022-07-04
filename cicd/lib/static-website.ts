@@ -10,7 +10,7 @@ import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 import {Construct} from "constructs";
 import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import * as path from "path";
-import fs from "fs";
+import * as fs from 'fs';
 
 export interface StaticWebsiteStackProps extends StackProps {
     apexDomain: string;
@@ -98,6 +98,7 @@ const getAllFilesFromFolder = (dir: string) => {
 
     let results: string[] = [];
 
+    console.log(fs)
     fs.readdirSync(dir).forEach((file: string) => {
 
         file = dir + '/' + file;
