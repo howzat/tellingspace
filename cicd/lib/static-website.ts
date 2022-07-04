@@ -10,7 +10,7 @@ import {CloudFrontTarget} from "aws-cdk-lib/aws-route53-targets";
 import {Construct} from "constructs";
 import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment";
 import * as path from "path";
-
+import fs from "fs";
 
 export interface StaticWebsiteStackProps extends StackProps {
     apexDomain: string;
@@ -70,8 +70,21 @@ export class StaticWebsiteStack extends Stack {
             zone: props.webCerts.hostedZone
         });
 
+        let contentsLocation = path.join("..", "webapp", "toldspaces", "public");
+        let resolve = path.resolve(contentsLocation);
+        console.log("contentsLocation from path", contentsLocation)
+        // @ts-ignore
+        fs.readdirSync(contentsLocation).forEach(file => {
+            console.log(file);
+        });
+
+        console.log("contentsLocation resolved", resolve)
+        fs.readdirSync(contentsLocation).forEach(file => {
+            console.log(file);
+        });
+
         new BucketDeployment(this, 'DeployWebsite', {
-            sources: [Source.asset(path.join("..", "webapp", "toldspaces", "public"))],
+            sources: [Source.asset(contentsLocation)],
             destinationBucket: this.siteContentBucket,
             distributionPaths: ['/*'],
             distribution,
