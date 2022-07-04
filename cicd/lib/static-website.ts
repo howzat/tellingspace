@@ -70,9 +70,14 @@ export class StaticWebsiteStack extends Stack {
             zone: props.webCerts.hostedZone
         });
 
+        let pwd = path.join("./");
+        console.log("contentsLocation from pwd", pwd)
+        fs.readdirSync(pwd).forEach(file => {
+            console.log(file);
+        });
+
         let contentsLocation = path.join("..", "webapp", "toldspaces", "public");
         console.log("contentsLocation from path", contentsLocation)
-        // @ts-ignore
         fs.readdirSync(contentsLocation).forEach(file => {
             console.log(file);
         });
