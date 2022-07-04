@@ -71,22 +71,13 @@ export class StaticWebsiteStack extends Stack {
         });
 
         let pwd = path.join("./");
-        console.log("contentsLocation from pwd", pwd)
-        fs.readdirSync(pwd).forEach(file => {
-            console.log(file);
-        });
+        console.log("contentsLocation from pwd", getAllFilesFromFolder(pwd))
 
-        let contentsLocation = path.join("..", "webapp", "toldspaces", "public");
-        console.log("contentsLocation from path", contentsLocation)
-        fs.readdirSync(contentsLocation).forEach(file => {
-            console.log(file);
-        });
+        let contentsLocation = path.join("./", "..", "webapp", "toldspaces", "public");
+        console.log("contentsLocation from path", getAllFilesFromFolder(contentsLocation))
 
         let resolve = path.resolve(contentsLocation);
-        console.log("contentsLocation resolved", resolve)
-        fs.readdirSync(resolve).forEach(file => {
-            console.log(file);
-        });
+        console.log("contentsLocation from path", getAllFilesFromFolder(contentsLocation))
 
         new BucketDeployment(this, 'DeployWebsite', {
             sources: [Source.asset(contentsLocation)],
@@ -102,3 +93,21 @@ export class StaticWebsiteStack extends Stack {
         new CfnOutput(this, 'DistributionId', {value: distribution.distributionId});
     }
 }
+
+const getAllFilesFromFolder = (dir: string) => {
+
+    let results: string[] = [];
+
+    fs.readdirSync(dir).forEach((file: string) => {
+
+        file = dir + '/' + file;
+        let stat = fs.statSync(file);
+
+        if (stat && stat.isDirectory()) {
+            results = results.concat(getAllFilesFromFolder(file))
+        } else results.push(file);
+
+    });
+
+    return results;
+};
