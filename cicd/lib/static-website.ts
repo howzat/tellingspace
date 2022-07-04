@@ -97,8 +97,6 @@ export class StaticWebsiteStack extends Stack {
 const getAllFilesFromFolder = (dir: string) => {
 
     let results: string[] = [];
-
-    console.log(fs)
     fs.readdirSync(dir).forEach((file: string) => {
 
         file = dir + '/' + file;
