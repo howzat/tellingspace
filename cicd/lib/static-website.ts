@@ -1,7 +1,6 @@
 import {AllowedMethods, Distribution, SecurityPolicyProtocol, ViewerProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
 
 import {aws_s3 as S3, CfnOutput, Duration, RemovalPolicy, Stack, StackProps} from 'aws-cdk-lib';
-import {BucketProps} from "aws-cdk-lib/aws-s3/lib/bucket";
 import {BlockPublicAccess, BucketAccessControl} from "aws-cdk-lib/aws-s3";
 import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
 import {WebsiteCertificatesStack} from "./website-certificates";
@@ -20,8 +19,6 @@ export interface StaticWebsiteStackProps extends StackProps {
 
 export class StaticWebsiteStack extends Stack {
 
-    public readonly siteContentBucket: S3.Bucket
-
     constructor(parent: Construct, name: string, props: StaticWebsiteStackProps) {
         super(parent, name, props);
 
@@ -31,17 +28,16 @@ export class StaticWebsiteStack extends Stack {
         // This bucket is handled as a bucket origin and CloudFront's redirect and error handling will be used.
         // The Origin will create an origin access identity and grant it access to the underlying bucket.
         // This can be used in conjunction with a bucket that is not public to require that your users access your content using CloudFront URLs and not S3 URLs directly.
-        let bucketProps: BucketProps = {
+        const website = new S3.Bucket(this, 'WebsiteBucket', {
             bucketName: `site-${props.apexDomain}`,
             // autoDeleteObjects: true,
             removalPolicy: RemovalPolicy.RETAIN,
             publicReadAccess: false,
             accessControl: BucketAccessControl.PRIVATE,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-        };
+        })
 
-        this.siteContentBucket = new S3.Bucket(this, 'WebsiteBuket', bucketProps)
-        console.log("content bucket created", this.siteContentBucket.bucketArn)
+        console.log("content bucket created", website.bucketArn)
 
         const distribution = new Distribution(this, 'CloudFrontDistribution', {
             domainNames: [props.apexDomain, wwwDomain],
@@ -50,7 +46,7 @@ export class StaticWebsiteStack extends Stack {
             minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
             defaultBehavior: {
                 compress: true,
-                origin: new S3Origin(this.siteContentBucket),
+                origin: new S3Origin(website),
                 allowedMethods: AllowedMethods.ALLOW_ALL,
                 viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             },
@@ -64,8 +60,6 @@ export class StaticWebsiteStack extends Stack {
             ],
         });
 
-        distribution.node.addDependency(this.siteContentBucket)
-
         new ARecord(this, 'SiteAliasRecord', {
             recordName: wwwDomain,
             target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
@@ -76,16 +70,18 @@ export class StaticWebsiteStack extends Stack {
         let resolve = path.resolve(contentsLocation);
         console.log("resolved location of assets contains", getAllFilesFromFolder(resolve))
 
-        new BucketDeployment(this, 'DeployWebsite', {
+        let bucketDeployment = new BucketDeployment(this, 'DeployWebsite', {
             sources: [Source.asset(contentsLocation)],
-            destinationBucket: this.siteContentBucket,
+            destinationBucket: website,
             distributionPaths: ['/*'],
-            distribution,
+            distribution: distribution,
         });
 
-        new CfnOutput(this, "WebsiteContentBucketDomainName", {value: this.siteContentBucket.bucketName,});
-        new CfnOutput(this, "WebsiteContentBucketName", {value: this.siteContentBucket.bucketDomainName,});
-        new CfnOutput(this, 'WebsiteContentBucket', {value: this.siteContentBucket.bucketArn});
+        bucketDeployment.node.addDependency(website, distribution)
+
+        new CfnOutput(this, "WebsiteContentBucketDomainName", {value: website.bucketName,});
+        new CfnOutput(this, "WebsiteContentBucketName", {value: website.bucketDomainName,});
+        new CfnOutput(this, 'WebsiteContentBucket', {value: website.bucketArn});
         new CfnOutput(this, 'DistributionDomainName', {value: distribution.domainName});
         new CfnOutput(this, 'DistributionId', {value: distribution.distributionId});
     }
