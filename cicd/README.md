@@ -21,7 +21,7 @@ $ git commit -a
 $ git push
 $ cdk deploy WebsitePipelineStack
 $ aws-vault exec tsdev -- cdk deploy -c sourceOwner=howzat -c sourceRepository=toldspaces
-Enter token for arn:aws:iam::678975692412:mfa/tsdev: 926768
+Enter token for arn:aws:iam::XXXXX:mfa/XXX: 926768
 SecretValue {
   creationStack: [ 'stack traces disabled' ],
   value: CfnDynamicReference {
