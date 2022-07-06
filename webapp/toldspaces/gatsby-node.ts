@@ -1,7 +1,6 @@
 import {CreatePagesArgs} from "gatsby";
 import fs from "fs";
 import path from "path";
-import {LocationProps, LocationTemplateProps} from "./src/templates/location";
 import flatprint from "./src/flatprint";
 
 export const createPages = async (
@@ -40,8 +39,7 @@ export const createPages = async (
 
     // @ts-ignore
     let nodes = result.data.allLocationsJson.nodes;
-
-    let sids = nodes.map((p) => p.sid);
+    let sids = nodes.map((p: { sid: string; }) => p.sid);
     const pcs = {
         data: {
             sids: sids,
@@ -59,7 +57,7 @@ export const createPages = async (
             component,
             context: {
                 sids: sids,
-                pc: pcs & { sid1: node.sid },
+                pc: pcs,
                 pagePath: path,
             },
         };

@@ -33,8 +33,8 @@ export class StaticWebsiteStack extends Stack {
         // This can be used in conjunction with a bucket that is not public to require that your users access your content using CloudFront URLs and not S3 URLs directly.
         let bucketProps: BucketProps = {
             bucketName: `site-${props.apexDomain}`,
-            autoDeleteObjects: true,
-            removalPolicy: RemovalPolicy.DESTROY,
+            // autoDeleteObjects: true,
+            removalPolicy: RemovalPolicy.RETAIN,
             publicReadAccess: false,
             accessControl: BucketAccessControl.PRIVATE,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
@@ -63,6 +63,8 @@ export class StaticWebsiteStack extends Stack {
                 }
             ],
         });
+
+        distribution.node.addDependency(this.siteContentBucket)
 
         new ARecord(this, 'SiteAliasRecord', {
             recordName: wwwDomain,

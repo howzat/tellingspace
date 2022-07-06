@@ -54,22 +54,23 @@ export class WebsitePipeline extends Stack {
         this.authentication = SecretValue.secretsManager(githubConfig.gitHubTokenPath());
         console.log("authentication", this.authentication)
 
+        let githubSource = CodePipelineSource.gitHub(repoString, githubConfig.branchName, {
+            trigger: GitHubTrigger.WEBHOOK,
+            authentication: this.authentication,
+        });
+
         const codePipeline = new CodePipeline(this, `${config.appName}BuildPipeline`, {
             pipelineName: 'ToldSpacesCICDPipeline',
             crossAccountKeys: false,
             codeBuildDefaults: {
                 partialBuildSpec: BuildSpec.fromObject({
                     version: "0.2",
-                    env: {
-                        "exported-variables": ["IS_CODEBUILD"]
-                    },
                     phases: {
                         install: {
                             "runtime-versions": {
                                 nodejs: 14
                             },
                             commands: [
-                                'export IS_CODEBUILD="true"',
                                 "n 16.15.1",
                             ]
                         }
@@ -78,25 +79,13 @@ export class WebsitePipeline extends Stack {
             },
             synth: new ShellStep('Synth', {
                 primaryOutputDirectory: 'cicd/cdk.out',
-                input: CodePipelineSource.gitHub(repoString, githubConfig.branchName, {
-                    trigger: GitHubTrigger.WEBHOOK,
-                    authentication: this.authentication,
-                }),
+                input: githubSource,
                 installCommands: [
-                    "cd webapp/toldspaces",
-                    "npm install",
-                    "npm ci",
-                    "cd ../../cicd",
-                    "npm install",
-                    "npm install -g aws-cdk",
+                    ".build.sh"
                 ],
                 commands: [
-                    "echo commands",
-                    "cd ../webapp/toldspaces",
-                    "ls -la",
-                    "npm run clean & npm run build",
-                    "cd ../../cicd",
-                    "cdk synth",
+                    "cd ./cicd",
+                    "npx cdk synth",
                 ],
             }),
         });
