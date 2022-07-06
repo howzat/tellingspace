@@ -30,8 +30,8 @@ export class StaticWebsiteStack extends Stack {
         // This can be used in conjunction with a bucket that is not public to require that your users access your content using CloudFront URLs and not S3 URLs directly.
         const website = new S3.Bucket(this, 'WebsiteBucket', {
             bucketName: `site-${props.apexDomain}`,
-            // autoDeleteObjects: true,
-            removalPolicy: RemovalPolicy.RETAIN,
+            autoDeleteObjects: true,
+            removalPolicy: RemovalPolicy.DESTROY,
             publicReadAccess: false,
             accessControl: BucketAccessControl.PRIVATE,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
