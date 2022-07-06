@@ -33,6 +33,7 @@ const LocationTemplate = ({data, pageContext}: LocationTemplateProps) => {
   return (
     <>
         <h1>So this is christmas</h1>
+        <p>And what have we done</p>
         <MainLayout navigationItems={items}><h1>Location Page </h1></MainLayout>
     </>
   )
