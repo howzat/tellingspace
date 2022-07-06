@@ -81,7 +81,9 @@ export class WebsitePipeline extends Stack {
                 primaryOutputDirectory: 'cicd/cdk.out',
                 input: githubSource,
                 installCommands: [
-                    ".build.sh"
+                    "ls -la",
+                    "pwd",
+                    "./build.sh"
                 ],
                 commands: [
                     "cd ./cicd",
