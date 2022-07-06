@@ -54,7 +54,7 @@ export class StaticWebsiteStack extends Stack {
                 {
                     httpStatus: 403,
                     responseHttpStatus: 403,
-                    responsePagePath: '404.html',
+                    responsePagePath: '/404.html',
                     ttl: Duration.minutes(30),
                 }
             ],
