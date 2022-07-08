@@ -21,11 +21,6 @@ export const MainLayout = ({children}: MainLayoutProps): JSX.Element => {
       <>
           {NewNavigationFromLocationsQuery(data.allLocationsJson)}
           {children}
-          <ol>
-              <li>this</li>
-              <li>that</li>
-              <li>the other</li>
-          </ol>
       </>
     )
 }

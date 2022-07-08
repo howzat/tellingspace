@@ -12,8 +12,8 @@
   },
   {
     "sid": "splinket",
-    "name": "location2",
-    "text": "Location 2",
+    "name": "The Splinket",
+    "text": "Hidden from sight unless you know how",
     "image": "../images/second-min.jpg",
     "coords": {
       "lat": 50.864059486259166,
@@ -23,8 +23,8 @@
   },
   {
     "sid": "drblackpill",
-    "name": "location3",
-    "text": "Location 3",
+    "name": "Dr Blackpill",
+    "text": "Genius, villian and thug. Pray you don't meet her!",
     "image": "../images/third-min.jpg",
     "coords": {
       "lat": 50.868221525389885,
