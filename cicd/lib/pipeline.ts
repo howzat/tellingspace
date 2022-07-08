@@ -90,7 +90,7 @@ export class WebsitePipeline extends Stack {
             }),
         });
 
-        codePipeline.addStage(new ApprovalStage(this, 'ApprovalStage'), {});
+        // codePipeline.addStage(new ApprovalStage(this, 'ApprovalStage'), {});
 
         let staticWebsiteHostingDeployStage = new StaticWebsiteHostingDeployStage(this, 'DeployStage', {env: props?.env});
         codePipeline.addStage(staticWebsiteHostingDeployStage, {})

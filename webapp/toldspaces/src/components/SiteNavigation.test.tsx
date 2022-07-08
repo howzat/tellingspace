@@ -46,11 +46,9 @@ describe("<Navigation />", () => {
 
         let findAllByType = root.findAllByType(Link);
         expect(findAllByType[0].props.to).toBe("toValue1")
-        expect(findAllByType[0].props.children).toHaveLength(2)
         expect(findAllByType[0].props.children).toContain("textValue1")
 
         expect(findAllByType[1].props.to).toBe("toValue2")
-        expect(findAllByType[1].props.children).toHaveLength(2)
         expect(findAllByType[1].props.children).toContain("textValue2")
     });
 

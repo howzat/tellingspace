@@ -3,6 +3,7 @@
 pushd .
 cd ./webapp/toldspaces || exit
 npm ci
+npm test
 npm run build
 popd || exit
 pushd .
