@@ -1,8 +1,11 @@
 import React from "react"
+import {MainLayout} from "../layouts/MainLayout";
 
 const IndexPage = () => {
   return (
-    <h1>Hello World</h1>
+    <MainLayout navigationItems={}>
+
+    </MainLayout>
   )
 }
 

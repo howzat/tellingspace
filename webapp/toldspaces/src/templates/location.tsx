@@ -1,6 +1,6 @@
 import React from "react"
 import {MainLayout} from "../layouts/MainLayout";
-import {SiteNavigationProps} from "../components/Navigation";
+import {NavigationProps} from "../components/Navigation";
 import {graphql} from "gatsby";
 import flatprint from "../flatprint";
 
@@ -16,27 +16,27 @@ export type LocationProps = {
 
 const LocationTemplate = ({data, pageContext}: LocationTemplateProps) => {
 
-  flatprint("data", data)
-  flatprint("pageContext", pageContext)
+    flatprint("data", data)
+    flatprint("pageContext", pageContext)
 
-  let items: SiteNavigationProps = {
-    links: [{
-      text: "element 1",
-      to: "string 1",
-    }, {
-      text: "element 2",
-      to: "string 2",
-    }]
-  }
+    let items: NavigationProps = {
+        links: [{
+            text: "element 1",
+            to: "string 1",
+        }, {
+            text: "element 2",
+            to: "string 2",
+        }]
+    }
 
-  console.log("LocationTemplate items", items)
-  return (
-    <>
-        <h1>So this is christmas</h1>
-        <p>And what have we done</p>
-        <MainLayout navigationItems={items}><h1>Location Page </h1></MainLayout>
-    </>
-  )
+    console.log("LocationTemplate items", items)
+    return (
+      <>
+          <h1>So this is christmas</h1>
+          <p>And what have we done</p>
+          <MainLayout navigationItems={items}><h1>Location Page </h1></MainLayout>
+      </>
+    )
 }
 
 export default LocationTemplate

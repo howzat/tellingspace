@@ -13,9 +13,15 @@
     "build": "gatsby build --verbose",
     "serve": "gatsby serve",
     "clean": "gatsby clean --verbose",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@types/jest": "^28.1.4",
+    "babel-preset-gatsby-package": "^2.18.0",
     "gatsby": "^4.1.0",
     "gatsby-plugin-image": "^2.17.0",
     "gatsby-plugin-manifest": "^4.17.0",
@@ -25,18 +31,23 @@
     "gatsby-source-filesystem": "^4.17.0",
     "gatsby-transformer-json": "^4.17.0",
     "gatsby-transformer-sharp": "^4.17.0",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-helmet": "^6.1.0"
+    "jest": "^28.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "ts-jest": "^28.0.5"
   },
   "devDependencies": {
     "@types/node": "^18.0.1",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
     "autoprefixer": "^10.4.7",
+    "babel-preset-gatsby": "^2.18.0",
     "gatsby-plugin-postcss": "^5.17.0",
+    "jest-environment-jsdom": "^28.1.2",
     "postcss": "^8.4.14",
     "tailwindcss": "^3.1.4",
+    "ts-node": "^10.8.2",
     "typescript": "^4.7.4"
   }
 }
