@@ -77,7 +77,7 @@ export const createSchemaCustomization = async (
     } = gatsbyContext
     const { createTypes } = actions
     const typeDefs = `
-    type LocationJson implements Node {
+    type LocationsJson implements Node {
        sid : String!
        name : String!
        text : String!

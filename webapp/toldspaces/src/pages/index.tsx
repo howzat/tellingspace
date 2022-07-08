@@ -3,9 +3,7 @@ import {MainLayout} from "../layouts/MainLayout";
 
 const IndexPage = () => {
   return (
-    <MainLayout navigationItems={}>
-
-    </MainLayout>
+    <MainLayout/>
   )
 }
 
