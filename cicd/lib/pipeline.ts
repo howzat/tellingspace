@@ -2,7 +2,7 @@ import {SecretValue, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {GitHubTrigger} from "aws-cdk-lib/aws-codepipeline-actions";
 import {CodePipeline, CodePipelineSource, ShellStep} from "aws-cdk-lib/pipelines";
-import {StaticWebsiteHostingDeployStage} from "./deploy-stage";
+import {ApprovalStage, StaticWebsiteHostingDeployStage} from "./deploy-stage";
 import {BuildSpec} from "aws-cdk-lib/aws-codebuild";
 
 export class GithubSourceConfig {
@@ -68,10 +68,10 @@ export class WebsitePipeline extends Stack {
                     phases: {
                         install: {
                             "runtime-versions": {
-                                nodejs: 14
+                                nodejs: 16
                             },
                             commands: [
-                                "n 16.15.1",
+                                "n 18.2.0",
                             ]
                         }
                     }
@@ -89,6 +89,8 @@ export class WebsitePipeline extends Stack {
                 ],
             }),
         });
+
+        codePipeline.addStage(new ApprovalStage(this, 'ApprovalStage'), {});
 
         let staticWebsiteHostingDeployStage = new StaticWebsiteHostingDeployStage(this, 'DeployStage', {env: props?.env});
         codePipeline.addStage(staticWebsiteHostingDeployStage, {})
