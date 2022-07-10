@@ -2,11 +2,8 @@ import React from "react"
 import {NewNavigationFromLocationsQuery} from "../components/Navigation";
 import {graphql, useStaticQuery} from "gatsby";
 
-export type MainLayoutProps = {
-    children?: React.ReactNode
-}
 
-export const MainLayout = ({children}: MainLayoutProps): JSX.Element => {
+export const MainLayout = (props: any): JSX.Element => {
 
   const data = useStaticQuery(graphql`{
       allLocationsJson {
@@ -20,7 +17,7 @@ export const MainLayout = ({children}: MainLayoutProps): JSX.Element => {
     return (
       <>
           {NewNavigationFromLocationsQuery(data.allLocationsJson)}
-          {children}
+          {props.children}
       </>
     )
 }

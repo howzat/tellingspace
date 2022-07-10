@@ -1,7 +1,6 @@
 import {CreatePagesArgs} from "gatsby";
 import fs from "fs";
 import path from "path";
-import flatprint from "./src/flatprint";
 
 export const createPages = async (
     gatsbyContext: CreatePagesArgs,
@@ -17,7 +16,6 @@ export const createPages = async (
       allLocationsJson {
         nodes {
           sid
-          image
         }
       }
     }`)
@@ -27,15 +25,10 @@ export const createPages = async (
         reporter.error(result.errors)
     }
 
-    let locationTemplate = `${__dirname}/src/templates/location.tsx`;
-    let s = path.resolve(locationTemplate);
-    console.log(s);
-
-    if (!fs.existsSync(s)) {
-        console.error("DOES NOT exist:", s);
+    let templatePath = path.resolve(`${__dirname}/src/templates/location.tsx`);
+    if (!fs.existsSync(templatePath)) {
+        console.error("DOES NOT exist:", templatePath);
     }
-
-    flatprint("graphql result returned ok", result)
 
     // @ts-ignore
     let nodes = result.data.allLocationsJson.nodes;
@@ -49,19 +42,15 @@ export const createPages = async (
     // @ts-ignore
     nodes.forEach(node => {
         const path = `/locations/${node.sid}/`
-        const component = `${s}`
-        console.log("path", path)
-        console.log("component", component)
+        const component = `${templatePath}`
         let args = {
             path,
             component,
             context: {
-                sids: sids,
-                pc: pcs,
+                sid: node.sid,
                 pagePath: path,
             },
         };
-        console.log("args", args)
         createPage(args)
     });
 }
@@ -81,15 +70,14 @@ export const createSchemaCustomization = async (
        sid : String!
        name : String!
        text : String!
-       image : String!
        description: String!
        coords : Coord!
     }
-    
+
     type Coord {
       lat : Float!
       lng : Float!
-    } 
+    }
   `
     createTypes(typeDefs)
 }

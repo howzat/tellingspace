@@ -10,14 +10,30 @@ const config: GatsbyConfig = {
     // Learn more at: https://gatsby.dev/graphql-typegen
     graphqlTypegen: true,
     plugins: [
-        "gatsby-plugin-image",
-        "gatsby-plugin-sharp",
-        "gatsby-transformer-sharp",
+        `gatsby-plugin-material-ui`,
+        {
+            resolve: `gatsby-theme-material-ui`,
+            options: {
+                webFontsConfig: {
+                    fonts: {
+                        google: [
+                            {
+                                family: `Montserrat`,
+                                variants: [`300`, `400`, `500`],
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+        `gatsby-plugin-image`,
+        `gatsby-plugin-sharp`,
+        `gatsby-transformer-sharp`,
         {
             resolve: 'gatsby-source-filesystem',
             options: {
                 "name": "images",
-                "path": "./src/images/",
+                "path": `${__dirname}/src/images`,
                 ignore: [`**/\.*`] // ignore files starting with a dot
             },
             __key: "images"
@@ -25,21 +41,27 @@ const config: GatsbyConfig = {
         {
             resolve: `gatsby-source-filesystem`,
             options: {
-                path: `./src/data/locations`,
+                path: `${__dirname}/src/data/locations`,
                 name: `locations`,
                 ignore: [`**/\.*`] // ignore files starting with a dot
             },
         },
-        "gatsby-plugin-postcss",
         "gatsby-plugin-react-helmet",
         "gatsby-plugin-sitemap",
         "gatsby-transformer-json",
         {
-            resolve: 'gatsby-plugin-manifest',
+            resolve: `gatsby-plugin-manifest`,
             options: {
-                "icon": "./src/images/icon.png"
-            }
-        },
+                name: `ToldSpaces`,
+                short_name: `ToldSpaces`,
+                description: `Exploring spaces using stories`,
+                lang: `en`,
+                start_url: `/`,
+                background_color: `#25A08B`,
+                display: `standalone`,
+                icon: `${__dirname}/src/images/icon.png`,
+            },
+        }
     ]
 }
 

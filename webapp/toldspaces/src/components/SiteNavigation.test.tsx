@@ -4,7 +4,8 @@
 import React from "react";
 import {Navigation} from "./Navigation";
 import TestRenderer from 'react-test-renderer';
-import {Link, useStaticQuery} from 'gatsby'
+import {useStaticQuery} from 'gatsby'
+import {Link} from 'gatsby-theme-material-ui';
 import {render} from "@testing-library/react";
 import {MainLayout} from "../layouts/MainLayout";
 
