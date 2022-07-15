@@ -14,9 +14,7 @@ import {PageProps} from "gatsby";
 
 export const theme = createTheme();
 
-export type MainLayoutProps = {
-    children?: React.ReactNode;
-}
+export type MainLayoutProps = {}
 
 const MainLayout = ({children}: PageProps<MainLayoutProps>): JSX.Element => {
 

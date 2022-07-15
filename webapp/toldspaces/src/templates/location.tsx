@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, {useEffect, useRef, useState} from 'react';
 import {graphql, PageProps} from "gatsby";
 import {GatsbyImage, getImage} from "gatsby-plugin-image"
 import {IGatsbyImageData} from "gatsby-plugin-image/dist/src/components/gatsby-image.browser";
@@ -10,8 +10,8 @@ import Grid from "@mui/material/Grid";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-// import mapboxgl from 'mapbox-gl'; // or "const mapboxgl = require('mapbox-gl');"
-
+import "mapbox-gl/dist/mapbox-gl.css"
+import mapboxgl from 'mapbox-gl'
 // const Item = styled(Paper)(({theme}) => ({
 //     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
 //     ...theme.typography.body2,
@@ -20,20 +20,26 @@ import Container from "@mui/material/Container";
 //     color: theme.palette.text.secondary,
 // }));
 
+const mapAccessToken: string = 'pk.eyJ1IjoiaG93emF0NzUiLCJhIjoiY2w1bWtyMWZzMGM1MzNqa2MwbzMzeHc4dSJ9.QFdrWEOBIFmXoUED1cAs7g'
+
+
 const LocationTemplate = ({data, pageContext}: PageProps<Queries.Query>) => {
-    // mapboxgl.accessToken = 'pk.eyJ1IjoiaG93emF0NzUiLCJhIjoiY2w1bWtyMWZzMGM1MzNqa2MwbzMzeHc4dSJ9.QFdrWEOBIFmXoUED1cAs7g';
-    //
-    //
-    // const map = new mapboxgl.Map({
-    //     container: 'map', // container ID
-    //     style: 'mapbox://styles/mapbox/streets-v11', // style URL
-    //     center: [-74.5, 40], // starting position [lng, lat]
-    //     zoom: 9, // starting zoom
-    //     projection: 'globe' // display the map as a 3D globe
-    // });
-    // map.on('style.load', () => {
-    //     map.setFog({}); // Set the default atmosphere style
-    // });
+
+    mapboxgl.accessToken = mapAccessToken
+    const mapContainer = useRef(null);
+    const map = useRef(null);
+    const [lng, setLng] = useState(-70.9);
+    const [lat, setLat] = useState(42.35);
+    const [zoom, setZoom] = useState(9);
+    useEffect(() => {
+        if (map.current) return; // initialize map only once
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [lng, lat],
+            zoom: zoom
+        });
+    });
 
     console.log("data", data)
     console.log("pageContext", pageContext)
@@ -64,12 +70,14 @@ const LocationTemplate = ({data, pageContext}: PageProps<Queries.Query>) => {
                       </Card>
                   </Grid>
                   <Grid item>
-                      <Card variant="outlined" sx={{maxWidth: 300}}>
+                      <Card variant="outlined" sx={{maxWidth: 400}}>
                           <CardContent>
                               <Typography variant={"h6"} color="text.secondary" gutterBottom>
                                   FIND ME IF YOU CAN
                               </Typography>
-
+                              <div>
+                                  <div ref={mapContainer} className="map-container"/>
+                              </div>
                           </CardContent>
                           <CardActions>
                               <Button size="medium">Learn More</Button>
