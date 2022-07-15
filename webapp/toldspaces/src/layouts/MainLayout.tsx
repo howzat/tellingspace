@@ -15,9 +15,10 @@ import {PageProps} from "gatsby";
 export const theme = createTheme();
 
 export type MainLayoutProps = {
-    children?: React.ReactNode
+    children?: React.ReactNode;
 }
-const MainLayout = (props: PageProps<MainLayoutProps>) => {
+
+const MainLayout = ({children}: PageProps<MainLayoutProps>): JSX.Element => {
 
     const locations: Array<Queries.LocationsJson> = useAllLocations()
     const imageMap = new Map<string, IGatsbyImageData>()
@@ -38,9 +39,7 @@ const MainLayout = (props: PageProps<MainLayoutProps>) => {
               </Toolbar>
           </AppBar>
           <main>
-              <>
-                  {props.children}
-              </>
+              {children!}
           </main>
           <Box sx={{bgcolor: 'background.paper', p: 6}} component="footer">
               <Typography variant="h6" align="center" gutterBottom>
@@ -51,13 +50,11 @@ const MainLayout = (props: PageProps<MainLayoutProps>) => {
                 align="center"
                 color="text.secondary"
                 component="p"
-              >
-                  TOLDSPACES is an experiment in making things outside
+              > TOLDSPACES is an experiment in making things outside
               </Typography>
               <Copyright/>
           </Box>
       </ThemeProvider>
-
     )
 }
 

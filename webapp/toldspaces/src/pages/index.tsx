@@ -27,7 +27,8 @@ const IndexPage = (): JSX.Element => {
     })
 
     return (
-      <MainLayout>
+
+      <MainLayout foo={'ddd'}>
           <Box
             sx={{
                 bgcolor: 'background.paper',
