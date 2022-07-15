@@ -31,15 +31,7 @@ export const createPages = async (
     }
 
     // @ts-ignore
-    let nodes = result.data.allLocationsJson.nodes;
-    let sids = nodes.map((p: { sid: string; }) => p.sid);
-    const pcs = {
-        data: {
-            sids: sids,
-        }
-    }
-
-    // @ts-ignore
+    let nodes: Array<Queries.LocationsJson> = result.data.allLocationsJson.nodes;
     nodes.forEach(node => {
         const path = `/locations/${node.sid}/`
         const component = `${templatePath}`
