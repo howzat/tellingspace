@@ -26,6 +26,7 @@ export const Navigation = ({links}: NavigationProps): JSX.Element => {
 
     let set = new Set<LinkData>();
     set.add({to: "/", text: "Home", linkText: "Home"})
+    set.add({to: "/map", text: "Map", linkText: "Map"})
     links.forEach(l => set.add(l))
     let newLinks = Array.from(set.values())
     newLinks.sort().reverse()

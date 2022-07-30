@@ -3,14 +3,14 @@ import fs from "fs";
 import path from "path";
 
 export const createPages = async (
-    gatsbyContext: CreatePagesArgs,
+  gatsbyContext: CreatePagesArgs,
 ): Promise<void> => {
     const {
         actions,
         graphql,
         reporter,
     } = gatsbyContext
-    const { createPage } = actions
+    const {createPage} = actions
 
     const result = await graphql(`{
       allLocationsJson {
@@ -49,14 +49,14 @@ export const createPages = async (
 
 
 export const createSchemaCustomization = async (
-    gatsbyContext: CreatePagesArgs,
+  gatsbyContext: CreatePagesArgs,
 ): Promise<void> => {
     const {
         actions,
         graphql,
         reporter,
     } = gatsbyContext
-    const { createTypes } = actions
+    const {createTypes} = actions
     const typeDefs = `
     type LocationsJson implements Node {
        sid : String!
@@ -74,4 +74,19 @@ export const createSchemaCustomization = async (
     createTypes(typeDefs)
 }
 
-
+// @ts-ignore
+export const onCreateWebpackConfig = ({stage, loaders, actions}) => {
+    console.log("stage:", stage)
+    if (stage === "build-html" || stage === "develop-html") {
+        actions.setWebpackConfig({
+            module: {
+                rules: [
+                    {
+                        test: /mapbox-gl/,
+                        use: 'null-loader'
+                    },
+                ],
+            },
+        })
+    }
+}

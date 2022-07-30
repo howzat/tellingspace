@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react';
 import {graphql, PageProps} from "gatsby";
 import {GatsbyImage, getImage} from "gatsby-plugin-image"
 import {IGatsbyImageData} from "gatsby-plugin-image/dist/src/components/gatsby-image.browser";
@@ -10,37 +10,12 @@ import Grid from "@mui/material/Grid";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import "mapbox-gl/dist/mapbox-gl.css"
-import mapboxgl from 'mapbox-gl'
-// const Item = styled(Paper)(({theme}) => ({
-//     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-//     ...theme.typography.body2,
-//     padding: theme.spacing(1),
-//     textAlign: 'center',
-//     color: theme.palette.text.secondary,
-// }));
+import Map from "../components/Map";
 
-const mapAccessToken: string = 'pk.eyJ1IjoiaG93emF0NzUiLCJhIjoiY2w1bWtyMWZzMGM1MzNqa2MwbzMzeHc4dSJ9.QFdrWEOBIFmXoUED1cAs7g'
-
+// @ts-ignore
+import mapboxgl from '!mapbox-gl';
 
 const LocationTemplate = ({data, pageContext}: PageProps<Queries.Query>) => {
-
-    mapboxgl.accessToken = mapAccessToken
-    const mapContainer = useRef(null);
-    const map = useRef(null);
-    const [lng, setLng] = useState(-70.9);
-    const [lat, setLat] = useState(42.35);
-    const [zoom, setZoom] = useState(9);
-    useEffect(() => {
-        if (map.current) return; // initialize map only once
-        map.current = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [lng, lat],
-            zoom: zoom
-        });
-    });
-
     console.log("data", data)
     console.log("pageContext", pageContext)
     let allLocationsJson = data.allLocationsJson;
@@ -51,16 +26,26 @@ const LocationTemplate = ({data, pageContext}: PageProps<Queries.Query>) => {
     let img: IGatsbyImageData = getImage(imageFile);
     return (
       <MainLayout>
-          <Container sx={{py: 8}} maxWidth="md">
-              <Grid sx={{flexGrow: 1}} container spacing={2}>
-                  <Grid item>
-                      <Card variant="outlined" sx={{maxWidth: 300}}>
+          <Container xs={{py: 8}} maxWidth="md">
+              <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 2, sm: 6, md: 12}}>
+                  <Grid item xs={2} sm={4} md={12}>
+                      <Card variant="outlined">
                           <CardContent>
-                              <Typography variant={"h6"} color="text.secondary" gutterBottom>
-                                  {locationJson.name}
+                              <Typography variant={"h5"} color="text.primary" gutterBottom>
+                                  <p>{locationJson.name}</p>
                               </Typography>
                               <Typography variant={"h7"} color="text.secondary" gutterBottom>
-                                  {locationJson.text}
+                                  <p>{locationJson.text}</p>
+                              </Typography>
+                              <Map/>
+                          </CardContent>
+                      </Card>
+                  </Grid>
+                  <Grid item xs={2} sm={4} md={12}>
+                      <Card variant="outlined">
+                          <CardContent>
+                              <Typography variant={"h6"} color="text.secondary" gutterBottom>
+                                  FIND ME IF YOU CAN
                               </Typography>
                               <GatsbyImage image={img} alt={locationJson.name!}/>
                           </CardContent>
@@ -69,21 +54,7 @@ const LocationTemplate = ({data, pageContext}: PageProps<Queries.Query>) => {
                           </CardActions>
                       </Card>
                   </Grid>
-                  <Grid item>
-                      <Card variant="outlined" sx={{maxWidth: 400}}>
-                          <CardContent>
-                              <Typography variant={"h6"} color="text.secondary" gutterBottom>
-                                  FIND ME IF YOU CAN
-                              </Typography>
-                              <div>
-                                  <div ref={mapContainer} className="map-container"/>
-                              </div>
-                          </CardContent>
-                          <CardActions>
-                              <Button size="medium">Learn More</Button>
-                          </CardActions>
-                      </Card>
-                  </Grid>
+
               </Grid>
           </Container>
       </MainLayout>
@@ -104,10 +75,7 @@ export const query = graphql`
                 image
                 {
                     childImageSharp{
-                        fluid(maxWidth:1000, quality:100){
-                            ...GatsbyImageSharpFluid
-                        }
-                        gatsbyImageData(placeholder:TRACED_SVG,formats:JPG)
+                        gatsbyImageData(placeholder:TRACED_SVG,formats:JPG, transformOptions: { fit: FILL })
                     }
                 }
                 description

@@ -3,7 +3,7 @@
     "sid": "thethunderor",
     "name": "The Thunderor!",
     "text": "The Journey Begins and the Thunderor Awakes",
-    "image": "../../images/first-min.jpg",
+    "image": "../../images/thethunderor.jpeg",
     "coords": {
       "lat": 50.86441161013995,
       "lng": -0.09220047454726349
@@ -14,7 +14,7 @@
     "sid": "thesplinket",
     "name": "The Splinket",
     "text": "Hidden from sight unless you know how",
-    "image": "../../images/second-min.jpg",
+    "image": "../../images/thesplinket.jpeg",
     "coords": {
       "lat": 50.864059486259166,
       "lng": -0.09993596512412799
@@ -25,7 +25,7 @@
     "sid": "drblackpill",
     "name": "Dr Blackpill",
     "text": "Genius, villian and thug. Pray you don't meet her!",
-    "image": "../../images/third-min.jpg",
+    "image": "../../images/drblackpill.jpeg",
     "coords": {
       "lat": 50.868221525389885,
       "lng": -0.10303260606760026
